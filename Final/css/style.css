@@ -1,0 +1,145 @@
+/* Global styling */
+
+body {
+    background-color: lightgrey;
+    overflow-x: hidden;
+}
+
+@keyframes load {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(80deg);
+    }
+}
+
+/* Chart modal */
+.larger {
+    width: 60%;
+    max-width: 60% !important;
+}
+
+.legend {
+    position: absolute;
+    right: 20px;
+    top: 5px;
+    float: right;
+}
+
+.xAxis {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+/* Legend styling */
+
+#load {
+    position: fixed;
+    left: 50%;
+    margin-left: -50px;
+    top: 50%;
+    margin-top: -50px;
+    z-index: 1;
+    animation: load .5s ease infinite;
+}
+
+#playbackButtons {
+    height: 38px;
+    position: absolute !important;
+    top: 100px;
+    right: 25vw;
+}
+
+#groupLegend {
+    position: absolute !important;
+    top: 90px;
+    left: 37.5vw;
+}
+
+#attrLegend {
+    position: absolute !important;
+    top: 110px;
+    left: 37.5vw;
+}
+
+/* Map styling */
+
+#colorLegend {
+    position: absolute !important;
+    top: 40px;
+    right: 25%;
+}
+
+#axisLabel {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.LGA_shape {
+    stroke: #646464;
+    stroke-width: 1px;
+    stroke-dasharray: 2, 2;
+    stroke-linejoin: round;
+    cursor: pointer;
+    transition: opacity ease 0.75s;
+}
+
+.LGA_shape:hover {
+    cursor: pointer;
+    stroke: white;
+    stroke-dasharray: none;
+    stroke-width: 2px;
+    opacity: 0.75;
+}
+
+/* Sidebar styling */
+#menu-toggle {
+    position: relative;
+    float: left;
+    left: 0;
+    top: 50%;
+    margin-left: -36.95px;
+    margin-top: -18px;
+}
+
+#sidebar-wrapper {
+    min-height: 100%;
+    width: 31.25%;
+    margin-right: -31.25%;
+    transition: margin .25s;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+}
+
+#page-content-wrapper {
+    min-width: 0;
+    width: 100%;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-right: 0;
+}
+
+.list-group-item {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.filterInfo span {
+    font-size: 12px;
+    vertical-align: middle;
+    line-height: 31px;
+}
+
+.activeFilter, .modFilter {
+    float: right;
+    margin-right: 3px;
+}

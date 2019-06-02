@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="description" content="Data Visualisation Project"/>
+    <meta name="keywords" content="HTML, CSS, D3, jQuery, Car, Accident, Data"/>
+    <meta name="author" content="Joshua Skinner"/>
+
+    <title>Validation Script Runner</title>
+
+    <script src="https://d3js.org/d3.v5.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="clean.js"></script>
+</head>
+<body>
+<h1>Validation Script</h1>
+<p>This script loads in the LGA (Local Government Area) names and crash data recordings.</p>
+<p>Each crash recording is checked to ensure it exists in one of the defined LGAs.</p>
+<p>If one does not exist, it will print a warning to console. For example: <em>The LGA Fake City doesn't exist @ crash
+    record #1337</em></p>
+<hr/>
+<section id="status">
+    <p id="load">The operation is being performed. Please wait a moment...</p>
+</section>
+</body>
+</html>

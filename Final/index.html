@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="description" content="Data Visualisation Project"/>
+    <meta name="keywords" content="HTML, CSS, D3, jQuery, Car, Accident, Data"/>
+    <meta name="author" content="Joshua Skinner"/>
+
+    <title>Car Accidents in Victoria</title>
+
+    <!--- Use bootstrap CSS as well as my own CSS --->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="css/style.css"/>
+
+    <!--- D3 --->
+    <script src="https://d3js.org/d3.v5.min.js" type="text/javascript"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+    <!--- Third party script libraries --->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" type="text/javascript" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" type="text/javascript"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+
+    <!--- My script --->
+    <script src="js/main.js"></script>
+    <script src="js/gui.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/utility.js"></script>
+</head>
+<body>
+<div class="d-flex toggled" id="wrapper">
+    <div id="page-content-wrapper">
+        <div id="map">
+            <div id="colorLegend" style="display: none"></div>
+            <div id="groupLegend" style="display: none">
+                <span>Grouped by:</span>
+                <span id="groupName">?</span>
+            </div>
+            <div id="attrLegend" style="display:none">
+                <span>Variable: </span>
+                <svg width="32" height="32">
+                    <rect x="8" y="8" height="16" width="16" stroke="black" stroke-width="1px"
+                          id="attrColorIcon"></rect>
+                </svg>
+                <span id="attrDesc">None (?/?)</span>
+            </div>
+            <div id="playbackButtons" class="btn-group" role="group" style="display: none">
+                <button id="stepBack" type="button" class="btn btn-secondary disabled">&laquo;</button>
+                <button id="togglePlayback" type="button" class="btn btn-secondary disabled">Pause</button>
+                <button id="stepForward" type="button" class="btn btn-secondary disabled">&raquo;</button>
+            </div>
+            <img src="load.png" id="load" alt="Loading..."/>
+        </div>
+    </div>
+
+    <div class="bg-light border-right" id="sidebar-wrapper" style="display: none">
+        <button class="btn btn-secondary" id="menu-toggle"><</button>
+        <div class="sidebar-heading">Modify Dataset</div>
+        <div class="list-group list-group-flush">
+            <div class="form-group list-group-item">
+                <p>How would you like to view calculations?</p>
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="radio" name="mode" id="calculateAsTotals" checked>
+                    <label class="form-check-label" for="calculateAsTotals">
+                        As Totals (in LGA)
+                    </label>
+                </div>
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="radio" name="mode" id="calculateAsAverages">
+                    <label class="form-check-label" for="calculateAsAverages">
+                        As Averages (per Accident in LGA)
+                    </label>
+                </div>
+            </div>
+            <a href="#" class="list-group-item list-group-item-action bg-light" id="toggle-attributes">Change
+                Attributes</a>
+            <div class="list-group-item" id="attributes" style="display: none">
+                <label for="selectScale">Select an attribute to visualise on the map.</label>
+                <select class="custom-select custom-select mb-3" id="selectScale">
+                    <option value="NO_OF_CRASHES" selected># of Accidents</option>
+                </select>
+            </div>
+            <a href="#" class="list-group-item list-group-item-action bg-light" id="toggle-filters">Change Filters</a>
+            <div class="list-group-item form-group" style="display: none" id="filterTab">
+                <label for="selectFilterAttr">Filter out unwanted attribute values.</label>
+                <select class="custom-select custom-select mb-3" id="selectFilterAttr" required>
+                    <option value="" selected>Select attribute...</option>
+                </select>
+                <div id="filterInvalid" class="invalid-feedback"></div>
+                <div id="filterValueSelection">
+                </div>
+                <div id="activeFilters">
+                </div>
+            </div>
+        </div>
+        <a href="#" class="list-group-item list-group-item-action bg-light" id="toggle-grouping">Change Grouping</a>
+        <div class="list-group-item" id="groupingTab" style="display: none">
+            <label for="selectGroupAttr">Select attribute to split dataset by its values.</label>
+            <select class="custom-select custom-select mb-3" id="selectGroupAttr" required>
+                <option value="" selected>No Grouping</option>
+            </select>
+            <div class="invalid-feedback">You cannot group this attribute while it has a filter applied to it!</div>
+        </div>
+        <a href="#" class="list-group-item list-group-item-action bg-light" id="toggle-threshold">Change Threshold</a>
+        <div class="list-group-item form-group" id="thresholdTab" style="display: none">
+            <label for="thresholdInput">Set a minimum amount of cases required per LGA. LGAs not meeting the threshold
+                are excluded from the dataset.</label>
+            <input maxlength="5" class="form-control" id="thresholdInput" placeholder="Threshold amount..." required>
+            <div class="invalid-feedback">Your threshold must be between 0 and 3000!</div>
+            <div id="noneSelected" style="display: none">
+                <hr/>
+                <div class="alert alert-danger">Warning: Your threshold is too high! No information is being
+                    displayed.
+                </div>
+            </div>
+            <hr/>
+            <button id="applyThreshold" class="btn btn-primary mb-2">Apply</button>
+        </div>
+        <a href="#" class="list-group-item list-group-item-action bg-light" id="toggle-chart">Generate Chart</a>
+        <div class="list-group-item form-group" id="chartTab" style="display: none">
+            <p>View value distribution for the currently selected data.</p>
+            <label for="selectBinSize">Please select bin size for the histogram.</label>
+            <select class="custom-select custom-select mb-3" id="selectBinSize" required>
+                <option value="10">10 Bins</option>
+                <option value="20" selected>20 Bins</option>
+                <option value="30">30 Bins</option>
+                <option value="40">40 Bins</option>
+                <option value="50">50 Bins</option>
+            </select>
+            <button id="createHistogram" class="btn btn-primary mb-2">Create Histogram</button>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalLGA" tabindex="-1" role="dialog" aria-labelledby="modalLGALabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLGALabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="modalLGABody" class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalChart" tabindex="-1" role="dialog" aria-labelledby="modalLGALabel" aria-hidden="true">
+    <div id="chartSize" class="modal-dialog larger modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalChartLabel">Generated Chart</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="modalChartBody" class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="print()">Print</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="legend.js" type="text/javascript"></script>
+</body>
+</html>
